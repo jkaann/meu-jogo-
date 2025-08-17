@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker Supremo - Otimizado</title>
+    <style>
+        /* === RESET E BASE === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #ffffff;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* === LAYOUT PRINCIPAL === */
+        .game-container {
+            display: flex;
+            min-height: 100vh;
+            backdrop-filter: blur(10px);
+            flex-direction: column;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .right-section {
+            width: 380px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(25px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* === NEWS TICKER === */
+        .news-ticker {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            padding: 12px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            color: #333; /* Cor alterada para cinza-escuro */
+            min-height: 40px;
+            overflow: hidden;
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* === CONTADORES === */
+        .cookie-counter {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(116, 185, 255, 0.3);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .cookies-per-second {
+            font-size: 1.3rem;
+            color: #333; /* Cor alterada para cinza-escuro */
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(225, 112, 85, 0.5);
+        }
+
+        /* === BISCOITO PRINCIPAL === */
+        .big-cookie {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle at 30% 30%, #f4d03f, #e67e22, #d35400);
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 8px rgba(255, 255, 255, 0.1),
+                inset 0 0 20px rgba(0, 0, 0, 0.2);
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            user-select: none;
+        }
+
+        .big-cookie::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 25%;
+            width: 20px;
+            height: 20px;
+            background: #8b4513;
+            border-radius: 50%;
+            box-shadow: 
+                40px 15px 0 #8b4513,
+                -10px 40px 0 #8b4513,
+                60px 45px 0 #8b4513,
+                20px 60px 0 #8b4513,
+                80px 20px 0 #8b4513,
+                45px 80px 0 #8b4513;
+        }
+
+        .big-cookie:hover {
+            transform: scale(1.05);
+        }
+
+        .big-cookie:active {
+            transform: scale(0.95);
+        }
+
+        /* === EFEITOS VISUAIS === */
+        .click-number {
+            position: absolute;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.8),
+                2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0px) scale(1);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-80px) scale(1.1);
+            }
+        }
+
+        /* === ACHIEVEMENTS E BOTÃO RESET === */
+        .achievements-container {
+            width: 100%;
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto; /* Empurra para o final do flex container */
+        }
+
+        .achievements-text {
+            font-size: 0.8rem; /* Fonte menor */
+            color: #333; /* Cor alterada para cinza-escuro */
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5253);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* === SEÇÃO UPGRADES === */
+        .upgrades-section {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            min-height: 140px;
+        }
+
+        .upgrades-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .upgrades-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .upgrade {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(116, 185, 255, 0.6);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: #fff; /* cor do texto do upgrade */
+        }
+
+        .upgrade:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .upgrade.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .upgrade.disabled:hover {
+            transform: none;
+        }
+
+        .upgrade.available {
+            opacity: 1; /* Garante que o upgrade "disponível" não seja opaco */
+            border-color: #ffd700;
+            animation: pulse-border 1s infinite;
+        }
+
+        /* === LOJA === */
+        .store-header {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .store-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .store-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .store-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .store-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .building {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .building:hover {
+            transform: translateX(5px);
+            border-color: rgba(116, 185, 255, 0.5);
+        }
+
+        .building.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .building.disabled:hover {
+            transform: none;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .building.available {
+            border-color: #9b59b6;
+            animation: pulse-border 1s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(155, 89, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0); }
+        }
+
+        .building-icon {
+            width: 60px;
+            height: 60px;
+            margin-right: 20px;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .building-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .building-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .building-price {
+            font-size: 1rem;
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .building-cps {
+            font-size: 0.9rem;
+            color: #a4b0be;
+            font-weight: 500;
+        }
+
+        .building-owned {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* === TOOLTIP === */
+        .tooltip {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(45, 52, 54, 0.95));
+            backdrop-filter: blur(15px);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 250px;
+            white-space: pre-line;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            line-height: 1.4;
+            top: -10px;
+            left: 110%;
+        }
+
+        .upgrade.available:hover .tooltip, .building:hover .tooltip {
+            display: block;
+        }
+        
+        /* === SISTEMA DE NOTIFICAÇÕES === */
+        .notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+            z-index: 2000;
+        }
+
+        .notification {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInOut 4s ease-in-out forwards;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* === EVENTOS ESPECIAIS === */
+        .golden-cookie {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #ffeb3b, #f57c00, #ff5722);
+            border: 4px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 9999;
+            animation: goldenPulse 1s ease-in-out infinite alternate;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: transparent;
+            user-select: none;
+            box-shadow: 0 0 20px 10px rgba(255, 255, 0, 0.8), 0 0 40px 20px rgba(255, 165, 0, 0.6);
+        }
+        
+        @keyframes goldenPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .cookie-rain {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #f4d03f, #e67e22, #d35400);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* === RESPONSIVO === */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            .main-content {
+                flex-direction: column;
+            }
+
+            .right-section {
+                width: 100%;
+            }
+
+            .big-cookie {
+                width: 250px;
+                height: 250px;
+            }
+
+            .left-section {
+                padding: 20px;
+            }
+            
+            .achievements-text {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        /* === OTIMIZAÇÕES DE PERFORMANCE === */
+        * {
+            will-change: auto;
+        }
+
+        .big-cookie, .building, .upgrade {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="main-content">
+            <div class="left-section">
+                <div class="news-ticker" id="newsTicker">Bem-vindo ao Cookie Clicker!</div>
+                <div class="cookie-counter" id="cookieCounter">0 biscoitos</div>
+                <div class="cookies-per-second" id="cpsDisplay">por segundo: 0</div>
+                <div class="big-cookie" id="bigCookie"></div>
+                <button id="resetButton" class="reset-button">RESETAR JOGO</button>
+            </div>
+
+            <div class="right-section">
+                <div class="upgrades-section">
+                    <div class="upgrades-title">UPGRADES DISPONÍVEIS</div>
+                    <div class="upgrades-container" id="upgradesContainer"></div>
+                </div>
+
+                <div class="store-header">Loja de Edifícios</div>
+                <div class="store-content" id="storeContent"></div>
+            </div>
+        </div>
+
+        <div class="achievements-container">
+            <div class="achievements-text" id="achievements">
+                <span>Biscoitos assados nesta sessão: <span id="sessionCookies">0</span></span>
+                <span>Biscoitos assados em toda vida: <span id="lifetimeCookies">0</span></span>
+                <span>Poder de clique: <span id="clickPower">1</span> biscoitos por clique</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script>
+        // ========================================
+        // FUNÇÕES GLOBAIS DE ÁUDIO
+        // ========================================
+        (() => {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+          function playClick() {
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(700, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.07);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.6, now + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.13);
+          }
+
+          window.playCookieSound = playClick;
+
+          document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('bigCookie');
+            if (el) el.addEventListener('click', playClick, { passive: true });
+            window.addEventListener('pointerdown', () => ctx.resume(), { once: true });
+          });
+        })();
+
+        // ========================================
+        // CLASSE PRINCIPAL DO JOGO OTIMIZADA
+        // ========================================
+        class CookieClickerGame {
+            constructor() {
+                this.initializeVariables();
+                this.initializeDOMElements();
+                this.initializeData();
+                this.bindEvents();
+                this.init();
+            }
+
+            initializeVariables() {
+                this.cookies = 0;
+                this.cookiesPerSecond = 0;
+                this.clickPower = 1;
+                this.sessionCookies = 0;
+                this.lifetimeCookies = 0;
+                
+                // Controles de otimização
+                this.lastUpdateTime = 0;
+                this.updateThrottle = 100; // Atualizar UI a cada 100ms max
+                this.saveThrottle = 10000; // Auto-save a cada 10s
+                this.lastSaveTime = 0;
+                
+                // Eventos especiais
+                this.goldenCookieTimeout = null;
+                this.goldenCookieActive = false;
+                this.frenzyActive = false;
+                this.frenzyEndTime = 0;
+                
+                this.newsIndex = 0;
+                this.isGameRunning = true;
+                
+                this.lastUpgradeCheck = 0;
+                this.upgradeCheckThrottle = 500; // Verificar upgrades a cada 500ms
+            }
+
+            initializeDOMElements() {
+                this.elements = {
+                    cookieCounter: document.getElementById('cookieCounter'),
+                    cpsDisplay: document.getElementById('cpsDisplay'),
+                    bigCookie: document.getElementById('bigCookie'),
+                    storeContent: document.getElementById('storeContent'),
+                    upgradesContainer: document.getElementById('upgradesContainer'),
+                    sessionCookiesDisplay: document.getElementById('sessionCookies'),
+                    lifetimeCookiesDisplay: document.getElementById('lifetimeCookies'),
+                    clickPowerDisplay: document.getElementById('clickPower'),
+                    newsTicker: document.getElementById('newsTicker'),
+                    resetButton: document.getElementById('resetButton'),
+                    notificationContainer: document.getElementById('notificationContainer')
+                };
+            }
+
+            initializeData() {
+                this.buildings = [
+                    { id: 'cursor', name: 'Cursor', icon: '☝️', baseCost: 15, baseCps: 0.1, owned: 0, costMultiplier: 1.15 },
+                    { id: 'grandma', name: 'Vovó', icon: '👵', baseCost: 100, baseCps: 1, owned: 0, costMultiplier: 1.15 },
+                    { id: 'farm', name: 'Fazenda', icon: '🚜', baseCost: 1100, baseCps: 8, owned: 0, costMultiplier: 1.15 },
+                    { id: 'factory', name: 'Fábrica', icon: '🏭', baseCost: 12000, baseCps: 47, owned: 0, costMultiplier: 1.15 },
+                    { id: 'mine', name: 'Mina', icon: '⛏️', baseCost: 130000, baseCps: 260, owned: 0, costMultiplier: 1.15 }
+                ];
+
+                this.upgrades = [
+                    { id: 'cursor-1', name: 'Luvas do Cursor', description: 'Dobra o poder de clique', cost: 250, bought: false, effect: () => this.clickPower *= 2 },
+                    { id: 'grandma-1', name: 'Colônia de Biscoitos', description: 'Vovós produzem 2x mais', cost: 1000, bought: false, effect: () => this.applyBuildingMultiplier('grandma', 2) },
+                    { id: 'farm-1', name: 'Irrigação da Fazenda', description: 'Fazendas produzem 2x mais', cost: 11000, bought: false, effect: () => this.applyBuildingMultiplier('farm', 2) },
+                    { id: 'cursor-2', name: 'Autoclicker', description: 'Triplica o poder de clique', cost: 10000, bought: false, effect: () => this.clickPower *= 3 },
+                    { id: 'factory-1', name: 'Automação Industrial', description: 'Fábricas produzem 2x mais', cost: 120000, bought: false, effect: () => this.applyBuildingMultiplier('factory', 2) }
+                ];
+
+                this.newsMessages = [
+                    "Biscoitos estão em alta!",
+                    "Mercado de biscoitos aquecido!",
+                    "Chuva de biscoitos prevista!",
+                    "Nova receita descoberta!",
+                    "Fábrica de biscoitos expandindo!",
+                ];
+            }
+
+            bindEvents() {
+                this.elements.bigCookie.addEventListener('click', (e) => this.handleCookieClick(e));
+                this.elements.resetButton.addEventListener('click', () => this.resetGame());
+                
+                // Delegação de eventos otimizada para store e upgrades
+                this.elements.storeContent.addEventListener('click', (e) => this.handleStoreClick(e));
+                this.elements.upgradesContainer.addEventListener('click', (e) => this.handleUpgradeClick(e));
+                
+                document.addEventListener('visibilitychange', () => {
+                    this.isGameRunning = !document.hidden;
+                }, { passive: true });
+            }
+            
+            // === NOVO SISTEMA DE NOTIFICAÇÃO ===
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                this.elements.notificationContainer.appendChild(notification);
+                
+                setTimeout(() => notification.remove(), 4000); // Remover após 4 segundos
+            }
+
+            // === UTILITÁRIOS OTIMIZADOS ===
+            formatNumber(num) {
+                if (num < 10) return num.toFixed(1);
+                if (num < 1000) return Math.floor(num).toString();
+                if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+                if (num < 1000000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num < 1000000000000) return (num / 1000000000).toFixed(1) + 'B';
+                return (num / 1000000000000).toFixed(1) + 'T';
+            }
+
+            // === SISTEMA DE SAVE/LOAD OTIMIZADO ===
+            saveGame() {
+                if (!this.isGameRunning) return;
+                
+                const now = Date.now();
+                if (now - this.lastSaveTime < this.saveThrottle) return;
+                this.lastSaveTime = now;
+
+                const gameState = {
+                    cookies: this.cookies,
+                    sessionCookies: this.sessionCookies,
+                    lifetimeCookies: this.lifetimeCookies,
+                    clickPower: this.clickPower,
+                    buildings: this.buildings.map(b => ({ id: b.id, owned: b.owned, baseCost: b.baseCost })),
+                    upgrades: this.upgrades.filter(u => u.bought).map(u => ({ id: u.id }))
+                };
+                
+                try {
+                    localStorage.setItem('cookieGame', JSON.stringify(gameState));
+                } catch (e) {
+                    console.warn('Erro ao salvar:', e);
+                }
+            }
+
+            loadGame() {
+                try {
+                    const saved = localStorage.getItem('cookieGame');
+                    if (!saved) return;
+
+                    const data = JSON.parse(saved);
+                    this.cookies = data.cookies || 0;
+                    this.sessionCookies = data.sessionCookies || 0;
+                    this.lifetimeCookies = data.lifetimeCookies || 0;
+                    this.clickPower = data.clickPower || 1;
+
+                    if (data.buildings) {
+                        data.buildings.forEach(savedBuilding => {
+                            const building = this.buildings.find(b => b.id === savedBuilding.id);
+                            if (building) {
+                                building.owned = savedBuilding.owned || 0;
+                                building.baseCost = savedBuilding.baseCost || building.baseCost;
+                            }
+                        });
+                    }
+
+                    if (data.upgrades) {
+                        data.upgrades.forEach(savedUpgrade => {
+                            const upgrade = this.upgrades.find(u => u.id === savedUpgrade.id);
+                            if (upgrade && !upgrade.bought) {
+                                upgrade.bought = true;
+                                upgrade.effect();
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Erro ao carregar:', e);
+                }
+            }
+
+            // === INTERFACE OTIMIZADA ===
+            updateUI() {
+                const now = Date.now();
+                if (now - this.lastUpdateTime < this.updateThrottle) return;
+                this.lastUpdateTime = now;
+
+                this.elements.cookieCounter.textContent = `${this.formatNumber(this.cookies)} biscoitos`;
+                this.elements.cpsDisplay.textContent = `por segundo: ${this.formatNumber(this.cookiesPerSecond)}`;
+                this.elements.sessionCookiesDisplay.textContent = this.formatNumber(this.sessionCookies);
+                this.elements.lifetimeCookiesDisplay.textContent = this.formatNumber(this.lifetimeCookies);
+                this.elements.clickPowerDisplay.textContent = this.formatNumber(this.clickPower);
+            }
+
+            createBuildingElements() {
+                this.elements.storeContent.innerHTML = '';
+                this.buildings.forEach(building => {
+                    const div = document.createElement('div');
+                    div.className = 'building';
+                    div.dataset.buildingId = building.id;
+                    
+                    const currentCps = this.getBuildingCps(building);
+                    const currentCost = this.getBuildingCost(building);
+                    
+                    div.innerHTML = `
+                        <div class="building-icon">${building.icon}</div>
+                        <div class="building-info">
+                            <div class="building-name">${building.name}</div>
+                            <div class="building-price">Custo: ${this.formatNumber(currentCost)}</div>
+                            <div class="building-cps">Gera: ${this.formatNumber(currentCps)}/s</div>
+                        </div>
+                        <div class="building-owned">${building.owned}</div>
+                        <div class="tooltip">
+                            <strong>${building.name}</strong><br>
+                            Custo: ${this.formatNumber(currentCost)}<br>
+                            Produção: ${this.formatNumber(currentCps)}/s
+                        </div>
+                    `;
+                    this.elements.storeContent.appendChild(div);
+                });
+            }
+
+            createUpgradeElements() {
+                this.elements.upgradesContainer.innerHTML = '';
+                this.upgrades.filter(u => !u.bought).forEach(upgrade => {
+                    const div = document.createElement('div');
+                    div.className = 'upgrade';
+                    div.dataset.upgradeId = upgrade.id;
+                    div.innerHTML = `?`; // Começa com o emoji '?'
+                    this.elements.upgradesContainer.appendChild(div);
+                });
+            }
+            
+            updateBuildingButtons() {
+                this.buildings.forEach(building => {
+                    const element = document.querySelector(`[data-building-id="${building.id}"]`);
+                    if (element) {
+                        const canAfford = this.cookies >= this.getBuildingCost(building);
+                        element.classList.toggle('disabled', !canAfford);
+                        element.classList.toggle('available', canAfford);
+                        
+                        const cost = this.getBuildingCost(building);
+                        const cps = this.getBuildingCps(building);
+                        element.querySelector('.building-price').textContent = `Custo: ${this.formatNumber(cost)}`;
+                        element.querySelector('.building-cps').textContent = `Gera: ${this.formatNumber(cps)}/s`;
+                        element.querySelector('.building-owned').textContent = building.owned;
+                    }
+                });
+            }
+
+            updateUpgradeButtons() {
+                this.upgrades.filter(u => !u.bought).forEach(upgrade => {
+                    const element = document.querySelector(`[data-upgrade-id="${upgrade.id}"]`);
+                    if (element) {
+                        const canAfford = this.cookies >= upgrade.cost;
+                        const wasDisabled = element.classList.contains('disabled');
+                        
+                        if (canAfford) {
+                            element.innerHTML = `
+                                ⭐
+                                <div class="tooltip">
+                                    <strong>${upgrade.name}</strong><br>
+                                    ${upgrade.description}<br>
+                                    Custo: ${this.formatNumber(upgrade.cost)}
+                                </div>
+                            `;
+                        } else {
+                             element.innerHTML = `
+                                ?
+                                <div class="tooltip" style="display: none;">
+                                    <strong>${upgrade.name}</strong><br>
+                                    ${upgrade.description}<br>
+                                    Custo: ${this.formatNumber(upgrade.cost)}
+                                </div>
+                            `;
+                        }
+
+                        element.classList.toggle('disabled', !canAfford);
+                        element.classList.toggle('available', canAfford);
+                        
+                        if (canAfford && wasDisabled) {
+                            this.showNotification(`Novo upgrade disponível: ${upgrade.name}!`);
+                        }
+                    }
+                });
+            }
+
+            // === SISTEMA DE CLIQUES OTIMIZADO ===
+            handleCookieClick(event) {
+                window.playCookieSound(); // Reproduzir o som
+                let cookiesEarned = this.clickPower;
+                
+                if (this.frenzyActive && Date.now() < this.frenzyEndTime) {
+                    cookiesEarned *= 7;
+                } else if (this.frenzyActive) {
+                    this.frenzyActive = false;
+                }
+
+                this.cookies += cookiesEarned;
+                this.sessionCookies += cookiesEarned;
+                this.lifetimeCookies += cookiesEarned;
+
+                this.showClickEffect(event, cookiesEarned);
+                this.updateUI();
+                this.updateBuildingButtons();
+                this.updateUpgradeButtons();
+            }
+            
+            // === NOVO MANIPULADOR DE EVENTOS DELEGADO ===
+            handleStoreClick(event) {
+                const buildingElement = event.target.closest('.building');
+                if (buildingElement) {
+                    const buildingId = buildingElement.dataset.buildingId;
+                    const building = this.buildings.find(b => b.id === buildingId);
+                    if (building) {
+                        this.buyBuilding(building);
+                    }
+                }
+            }
+
+            handleUpgradeClick(event) {
+                const upgradeElement = event.target.closest('.upgrade');
+                if (upgradeElement) {
+                    const upgradeId = upgradeElement.dataset.upgradeId;
+                    const upgrade = this.upgrades.find(u => u.id === upgradeId);
+                    if (upgrade) {
+                        this.buyUpgrade(upgrade);
+                    }
+                }
+            }
+
+            showClickEffect(event, amount) {
+                const rect = this.elements.bigCookie.getBoundingClientRect();
+                const clickDiv = document.createElement('div');
+                clickDiv.className = 'click-number';
+                clickDiv.textContent = `+${this.formatNumber(amount)}`;
+                clickDiv.style.left = `${event.clientX - rect.left}px`;
+                clickDiv.style.top = `${event.clientY - rect.top}px`;
+                
+                this.elements.bigCookie.appendChild(clickDiv);
+                setTimeout(() => clickDiv.remove(), 1000);
+            }
+
+            // === SISTEMA DE BUILDINGS OTIMIZADO ===
+            getBuildingCost(building) {
+                return Math.ceil(building.baseCost * Math.pow(building.costMultiplier, building.owned));
+            }
+
+            getBuildingCps(building) {
+                return building.baseCps;
+            }
+
+            buyBuilding(building) {
+                const cost = this.getBuildingCost(building);
+                if (this.cookies >= cost) {
+                    this.cookies -= cost;
+                    building.owned++;
+                    building.baseCost = cost;
+                    
+                    this.updateCps();
+                    this.updateUI();
+                    this.updateBuildingButtons();
+                    this.updateUpgradeButtons();
+                    this.saveGame();
+                }
+            }
+
+            // === SISTEMA DE UPGRADES OTIMIZADO ===
+            buyUpgrade(upgrade) {
+                if (!upgrade.bought && this.cookies >= upgrade.cost) {
+                    this.cookies -= upgrade.cost;
+                    upgrade.bought = true;
+                    upgrade.effect();
+                    
+                    const element = document.querySelector(`[data-upgrade-id="${upgrade.id}"]`);
+                    if (element) element.remove();
+                    
+                    this.updateCps();
+                    this.updateUI();
+                    this.updateBuildingButtons();
+                    this.updateUpgradeButtons();
+                    this.saveGame();
+                }
+            }
+
+            applyBuildingMultiplier(buildingId, multiplier) {
+                const building = this.buildings.find(b => b.id === buildingId);
+                if (building) {
+                    building.baseCps *= multiplier;
+                    this.updateCps();
+                }
+            }
+
+            updateCps() {
+                this.cookiesPerSecond = this.buildings.reduce((total, building) => {
+                    return total + (building.owned * building.baseCps);
+                }, 0);
+            }
+
+            // === LOOP PRINCIPAL OTIMIZADO ===
+            gameLoop() {
+                if (!this.isGameRunning) return;
+
+                const now = Date.now();
+                const deltaTime = Math.min(now - (this.lastLoopTime || now), 1000);
+                this.lastLoopTime = now;
+
+                const cookiesPerMs = this.cookiesPerSecond / 1000;
+                const cookiesEarned = cookiesPerMs * deltaTime;
+                
+                if (cookiesEarned > 0) {
+                    this.cookies += cookiesEarned;
+                    this.sessionCookies += cookiesEarned;
+                    this.lifetimeCookies += cookiesEarned;
+                }
+
+                this.updateUI();
+                
+                if (now - this.lastUpgradeCheck > this.upgradeCheckThrottle) {
+                    this.updateUpgradeButtons();
+                    this.updateBuildingButtons();
+                    this.lastUpgradeCheck = now;
+                }
+            }
+
+            // === EVENTOS ESPECIAIS OTIMIZADOS ===
+            startGoldenCookieTimer() {
+                if (this.goldenCookieTimeout) return;
+                
+                const delay = 30000 + Math.random() * 60000;
+                this.goldenCookieTimeout = setTimeout(() => {
+                    this.spawnGoldenCookie();
+                    this.goldenCookieTimeout = null;
+                    this.startGoldenCookieTimer();
+                }, delay);
+            }
+
+            spawnGoldenCookie() {
+                if (this.goldenCookieActive) return;
+                this.goldenCookieActive = true;
+
+                const golden = document.createElement('div');
+                golden.className = 'golden-cookie';
+                golden.style.left = `${Math.random() * (window.innerWidth - 100)}px`;
+                golden.style.top = `${Math.random() * (window.innerHeight - 100)}px`;
+
+                golden.addEventListener('click', () => {
+                    const bonus = Math.max(this.cookies * 0.15, this.cookiesPerSecond * 60);
+                    this.cookies += bonus;
+                    this.sessionCookies += bonus;
+                    this.lifetimeCookies += bonus;
+
+                    this.frenzyActive = true;
+                    this.frenzyEndTime = Date.now() + 15000;
+
+                    this.showEventMessage('FRENESI!', golden.style.left, golden.style.top);
+                    golden.remove();
+                    this.goldenCookieActive = false;
+                });
+
+                document.body.appendChild(golden);
+                
+                setTimeout(() => {
+                    if (golden.parentNode) {
+                        golden.remove();
+                        this.goldenCookieActive = false;
+                    }
+                }, 10000);
+            }
+
+            showEventMessage(message, left, top) {
+                const msg = document.createElement('div');
+                msg.className = 'click-number';
+                msg.textContent = message;
+                msg.style.position = 'fixed';
+                msg.style.left = left;
+                msg.style.top = top;
+                msg.style.fontSize = '2rem';
+                msg.style.color = '#ffd700';
+                msg.style.zIndex = '10000';
+                
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 1500);
+            }
+
+            // === SISTEMA DE NOTÍCIAS OTIMIZADO ===
+            updateNews() {
+                if (this.newsMessages.length === 0) return;
+                this.elements.newsTicker.textContent = this.newsMessages[this.newsIndex];
+                this.newsIndex = (this.newsIndex + 1) % this.newsMessages.length;
+            }
+
+            // === RESET OTIMIZADO ===
+            resetGame() {
+                if (!confirm('Deseja resetar o jogo? Todo progresso será perdido!')) return;
+
+                if (this.goldenCookieTimeout) {
+                    clearTimeout(this.goldenCookieTimeout);
+                    this.goldenCookieTimeout = null;
+                }
+
+                document.querySelectorAll('.golden-cookie, .click-number, .cookie-rain').forEach(el => el.remove());
+
+                this.cookies = 0;
+                this.cookiesPerSecond = 0;
+                this.clickPower = 1;
+                this.sessionCookies = 0;
+                this.lifetimeCookies = 0;
+                this.goldenCookieActive = false;
+                this.frenzyActive = false;
+
+                this.buildings.forEach(building => {
+                    building.owned = 0;
+                    building.baseCps = [0.1, 1, 8, 47, 260][this.buildings.indexOf(building)];
+                    building.baseCost = [15, 100, 1100, 12000, 130000][this.buildings.indexOf(building)];
+                });
+
+                this.upgrades.forEach(upgrade => {
+                    upgrade.bought = false;
+                });
+
+                localStorage.removeItem('cookieGame');
+
+                this.createBuildingElements();
+                this.createUpgradeElements();
+                this.updateUI();
+            }
+
+            // === INICIALIZAÇÃO PRINCIPAL ===
+            init() {
+                this.loadGame();
+                this.createBuildingElements();
+                this.createUpgradeElements();
+                this.updateCps();
+                this.updateUI();
+
+                this.gameLoopInterval = setInterval(() => this.gameLoop(), 50);
+                this.newsInterval = setInterval(() => this.updateNews(), 8000);
+                this.saveInterval = setInterval(() => this.saveGame(), 10000);
+                
+                this.startGoldenCookieTimer();
+                this.updateNews();
+
+                window.addEventListener('beforeunload', () => {
+                    this.saveGame();
+                    clearInterval(this.gameLoopInterval);
+                    clearInterval(this.newsInterval);
+                    clearInterval(this.saveInterval);
+                });
+            }
+        }
+
+        // === INICIALIZAÇÃO GLOBAL ===
+        let game;
+
+        if (window.requestIdleCallback) {
+            requestIdleCallback(() => {
+                game = new CookieClickerGame();
+            });
+        } else {
+            setTimeout(() => {
+                game = new CookieClickerGame();
+            }, 100);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (game) {
+                game.isGameRunning = !document.hidden;
+                if (game.isGameRunning) {
+                    game.lastLoopTime = Date.now();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+                
